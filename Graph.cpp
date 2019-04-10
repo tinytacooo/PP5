@@ -1,5 +1,7 @@
 #include "Graph.hpp"
 
+/* GRAPH methods */
+
 void Graph::addVertex(std::string label) {
     V.insert({label, Vertex(label)});
 }
@@ -12,19 +14,25 @@ void Graph::removeVertex(std::string label) {
 }
 
 void Graph::addEdge(std::string label1, std::string label2, unsigned long weight) {
-    E.insert(Edge(label1, label2, weight));
+    if(getEdgeId(label1, label2) == 0) {
+        E.insert({++edgeId, Edge(label1, label2, weight)});
 
-    addVertex(label1);
-    addVertex(label2);
+        addVertex(label1);
+        addVertex(label2);
 
-    addAdjacency(label1, label2);
-    addAdjacency(label2, label1);
-
-//    std::cout << "VERTEX AT LABEL1: " << V.at(label1).getLabel() << std::endl;
+        addAdjacency(label1, label2);
+        addAdjacency(label2, label1);
+    }
 }
 
 void Graph::removeEdge(std::string label1, std::string label2) {
-    std::cout << "removeEdge called\n";
+    int id = getEdgeId(label1, label2);
+    if (id != 0) {
+        removeVertex(label1);
+        removeVertex(label2);
+        E.erase(id);
+    }
+    else std::cout << "EDGE NOT DELETED\n";
 }
 
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path) {
@@ -33,18 +41,31 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
     return 0;
 }
 
-/* helpers */
-
-bool Vertex::hasAdjVertex(std::string label) {
-    if (adjVertices.find(label) != adjVertices.end())
-        return true;
-    else
-        return false;
-}
-
+/* GRAPH helpers */
 void Graph::addAdjacency(std::string curr, std::string adj) {
     V.at(curr).addAdjVertex(adj, &(V.at(adj)));
 }
+
+bool Graph::isAdjVertex(std::string label1, std::string label2) {
+    return (hasVertex(label1) && hasVertex(label2) && V.at(label1).hasAdjVertex(label2));
+}
+
+int Graph::getEdgeId(std::string label1, std::string label2) {
+    for (auto it : E) {
+        if (it.second.isStartVertex(label1, label2) && it.second.isEndVertex(label1, label2))
+            return it.first;
+    }
+
+    return 0;
+}
+
+/* VERTEX methods */
+
+bool Vertex::hasAdjVertex(std::string label) {
+    return (adjVertices.find(label) != adjVertices.end());
+}
+
+/* REMOVE */
 
 void Vertex::printAdjV() {
     for (auto it : adjVertices)
@@ -52,11 +73,16 @@ void Vertex::printAdjV() {
 }
 
 void Graph::printGraph() {
-    std::cout << "VERTICES:\n";
+/*    std::cout << "VERTICES:\n";
     for (auto it : V) {
         std::cout << it.second.getLabel() << "\t=>";
         for (auto itr : it.second.getAdjacentVertices())
             std::cout << "\t" << itr.first;
         std::cout << "\n";
+    }
+*/
+    std::cout << "EDGES:\n";
+    for (auto it : E) {
+        std::cout << it.first << " " << it.second.getStartVertex() <<  "  " << it.second.getEndVertex() << "  " << it.second.getWeight() << std::endl;
     }
 }

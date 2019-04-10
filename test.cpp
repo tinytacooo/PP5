@@ -21,7 +21,8 @@ int main() {
         switch(opt) {
             case 1: { cin >> v1; G.addVertex(v1); break; }
             case 2: { cin >> v1; G.removeVertex(v1); break; }
-            case 3: { cin >> v1; cin >> v2; cin >> n; G.addEdge(v1, v2, n); }
+            case 3: { cin >> v1; cin >> v2; cin >> n; G.addEdge(v1, v2, n); break; }
+            case 4: { cin >> v1; cin >> v2; G.removeEdge(v1, v2); break; }
         }
 
         G.printGraph();
