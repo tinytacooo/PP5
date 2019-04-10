@@ -5,21 +5,10 @@ void Graph::addVertex(std::string label) {
 }
 
 void Graph::removeVertex(std::string label) {
-    Vertex* v = &(V.at(label));
+    for (std::map<std::string, Vertex>::iterator it = V.begin(); it != V.end(); it++)
+            it->second.removeAdjVertex(label);
 
-    std::cout << "FOUND VERTEX: " << v->getLabel() << std::endl;
-
-    for (std::map<std::string, Vertex>::iterator it = V.begin(); it != V.end(); it++) {
-        bool b = it->second.hasAdjVertex(label);
-        std::cout << (b ? "HAS VERTEX" : "DOES NOT HAVE VERTEX") << std::endl;
-
-        if(v != nullptr) {
-            std::cout << "FROM " << it->first << " REMOVING " << v->getLabel() << std::endl;
-            std::cout << "REMOVED " << it->second.removeAdjVertex(label) << " RECORDS\n";
-        }
-    }
-
-//    V.erase(label);
+    V.erase(label);
 }
 
 void Graph::addEdge(std::string label1, std::string label2, unsigned long weight) {
