@@ -53,15 +53,14 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
 
     vertexDistance.at(startLabel) = 0;      // distance from start vertex to itself is 0
 
-int count = 0;
-    while (!vertexDistance.empty() && ++count < 10) {
+    while (!vertexDistance.empty()) {
         std::string currLabel = getMinDistanceLabel(vertexDistance);
         Vertex curr = V.at(currLabel);
         unsigned long currDistance = vertexDistance.at(currLabel);
 
-/*        std::cout << "CURRVERTEX: " << currLabel << "\tADJACENCIES:\t";
+        std::cout << "CURRVERTEX: " << currLabel << "\tADJACENCIES:\t";
         for (auto it : vertexDistance) { std::cout << it.first << ", " << it.second << "\t"; }
-        std::cout << "\n";  */
+        std::cout << "\n";
 
         for (auto it : curr.getAdjacentVertices()) {
             if (vertexDistance.find(it.first) != vertexDistance.end()) {
@@ -71,11 +70,11 @@ int count = 0;
             }
         }
 
-/*        std::cout << "CURRVERTEX: " << currLabel << "\tFIXED ADJCN:\t";
+        std::cout << "CURRVERTEX: " << currLabel << "\tFIXED ADJCN:\t";
         for (auto it : vertexDistance) { std::cout << it.first << ", " << it.second << "\t"; }
         std::cout << "\n\tLIST:\t";
         for (auto it : minDistances) { std::cout << it.first << ", " << it.second << "\t"; }
-        std::cout << "\n";  */
+        std::cout << "\n";
 
         vertexDistance.erase(currLabel);
     }

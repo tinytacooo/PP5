@@ -11,10 +11,11 @@ struct EdgeStruct { std::string a; std::string b; unsigned long w; };
 int main() {
     Graph g;
 
-    std::vector<std::string> vertices1 { "1", "2", "3", "4", "5", "6" };
+    std::vector<std::string> vertices1 { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
     std::vector<EdgeStruct> edges1 {
-      {"1", "2", 7}, {"1", "3", 9}, {"1", "6", 14}, {"2", "3", 10}, {"2", "4", 15}, {"3", "4", 11},
-      {"3", "6", 2}, {"4", "5", 6}, {"5", "6", 9},
+      {"0", "1", 1}, {"0", "4", 1}, {"1", "2", 2}, {"1", "5", 2}, {"2", "6", 1}, {"2", "3", 1},
+      {"3", "7", 2}, {"4", "8", 2}, {"5", "6", 1}, {"5", "10", 4}, {"6", "11", 2}, {"7", "12", 1},
+      {"8", "9", 3}, {"9", "10", 1}, {"10", "11", 2}, {"11", "12", 5}
     };
     std::vector<std::string> path;
 
@@ -22,7 +23,7 @@ int main() {
     for (const auto &e : edges1) g.addEdge(e.a, e.b, e.w);
 
     g.printGraph();
-    g.shortestPath("1", "5", path);
+    g.shortestPath("1", "12", path);
 
     return 0;
 }
