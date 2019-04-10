@@ -3,8 +3,8 @@
 
 #include "GraphBase.hpp"
 #include <algorithm>
+#include <climits>
 #include <map>
-#include <set>
 #include <iostream> // REMOVE
 
 class Vertex {
@@ -57,8 +57,11 @@ public:
     unsigned long shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path);
     /* helpers */
     void addAdjacency(std::string curr, std::string adj);               // add vertex adjaceny
+    unsigned long compareDistances(std:: string curr, std::string adj, unsigned long currDistance, unsigned long oldDistance);
     int  getEdgeId(std::string label1, std::string label2);             // each edge has an id; returns this value
     int  getEdgeId(std::string label1);
+    std::string getMinDistanceLabel(std::map<std::string, unsigned long> vDist);    // return label of vertex w/ min distance to start vertex
+    unsigned long getWeight(std::string curr, std::string adj);
     void printGraph(); // REMOVE
 };
 

@@ -44,14 +44,72 @@ void Graph::removeEdge(std::string label1) {
 }
 
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path) {
-    std::cout << "shortestPath called\n";
+    std::map<std::string, unsigned long> vertexDistance;
+    std::map<std::string, std::string> minDistances;
+    for (auto it : V) {
+        vertexDistance.insert({it.first, LONG_MAX});    // all vertices have an initial distance of 'infinity'
+        minDistances.insert({it.first, "UNK"});         // initial shortest path in direction of start vertex from each vertex is unknown
+    }
 
-    return 0;
+    vertexDistance.at(startLabel) = 0;      // distance from start vertex to itself is 0
+
+int count = 0;
+    while (!vertexDistance.empty() && ++count < 10) {
+        std::string currLabel = getMinDistanceLabel(vertexDistance);
+        Vertex curr = V.at(currLabel);
+        unsigned long currDistance = vertexDistance.at(currLabel);
+
+/*        std::cout << "CURRVERTEX: " << currLabel << "\tADJACENCIES:\t";
+        for (auto it : vertexDistance) { std::cout << it.first << ", " << it.second << "\t"; }
+        std::cout << "\n";  */
+
+        for (auto it : curr.getAdjacentVertices()) {
+            if (vertexDistance.find(it.first) != vertexDistance.end()) {
+                unsigned long oldDistance = vertexDistance.at(it.first);
+                vertexDistance.at(it.first) = compareDistances(currLabel, it.first, currDistance, oldDistance);
+                (oldDistance != vertexDistance.at(it.first)) ? minDistances.at(it.first) = currLabel : it.first;
+            }
+        }
+
+/*        std::cout << "CURRVERTEX: " << currLabel << "\tFIXED ADJCN:\t";
+        for (auto it : vertexDistance) { std::cout << it.first << ", " << it.second << "\t"; }
+        std::cout << "\n\tLIST:\t";
+        for (auto it : minDistances) { std::cout << it.first << ", " << it.second << "\t"; }
+        std::cout << "\n";  */
+
+        vertexDistance.erase(currLabel);
+    }
+
+    std::cout << "FINAL LIST:\t";
+    for (auto it : minDistances) { std::cout << it.first << ", " << it.second << "\t"; }
+    std::cout << "\n";
+
+    std::string currLabel = endLabel;
+    unsigned int sum = 0;
+    std::string pathl = endLabel;
+    path.emplace(path.begin(), endLabel);
+    while (currLabel != startLabel) {
+        pathl = minDistances.at(currLabel) + " " + pathl;
+        path.emplace(path.begin(), minDistances.at(currLabel));
+        sum += getWeight(currLabel, minDistances.at(currLabel));
+        currLabel = minDistances.at(currLabel);
+    }
+    std::cout << "SHORTEST PATH (" << sum  << "): " << pathl << std::endl;
+
+    return sum;
 }
 
 /* GRAPH helpers */
 void Graph::addAdjacency(std::string curr, std::string adj) {
     V.at(curr).addAdjVertex(adj, &(V.at(adj)));
+}
+
+unsigned long Graph::compareDistances(std:: string curr, std::string adj, unsigned long currDistance, unsigned long oldDistance) {
+    unsigned long newDistance = currDistance + getWeight(curr, adj);
+    if (newDistance < oldDistance)
+        return newDistance;
+    else
+        return oldDistance;
 }
 
 int Graph::getEdgeId(std::string label1, std::string label2) {
@@ -70,6 +128,22 @@ int Graph::getEdgeId(std::string label1) {
     return 0;
 }
 
+std::string Graph::getMinDistanceLabel(std::map<std::string, unsigned long> vDist) {
+    std::string ret;
+    unsigned long min = LONG_MAX;
+    for (auto it : vDist) {
+        if (it.second < min) {
+            ret = it.first;
+            min = it.second;
+        }
+    }
+    return ret;
+}
+
+unsigned long Graph::getWeight(std::string curr, std::string adj) {
+    return E.at(getEdgeId(curr, adj)).getWeight();
+}
+
 /* VERTEX methods */
 bool Vertex::hasAdjVertex(std::string label) {
     return (adjVertices.find(label) != adjVertices.end());
@@ -80,14 +154,14 @@ bool Vertex::hasAdjVertex(std::string label) {
 void Graph::printGraph() {
     std::cout << "VERTICES:\n";
     for (auto it : V) {
-        std::cout << it.second.getLabel() << "\t=>";
+        std::cout << it.second.getLabel() << "  =>";
         for (auto itr : it.second.getAdjacentVertices())
-            std::cout << "\t" << itr.first;
+            std::cout << "  " << itr.first;
         std::cout << "\n";
     }
 
     std::cout << "EDGES:\n";
     for (auto it : E) {
-        std::cout << it.first << " " << it.second.getStartVertex() <<  "  " << it.second.getEndVertex() << "  " << it.second.getWeight() << std::endl;
+        std::cout << it.first << ":  " << it.second.getStartVertex() <<  "  " << it.second.getEndVertex() << "  " << it.second.getWeight() << std::endl;
     }
 }

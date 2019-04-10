@@ -1,6 +1,33 @@
 /* test file */
 
-/****** GRAPH TEST ********/
+/****** TDD GRAPH TEST **********/
+
+#include "Graph.hpp"
+#include <iostream>
+using namespace std;
+
+struct EdgeStruct { std::string a; std::string b; unsigned long w; };
+
+int main() {
+    Graph g;
+
+    std::vector<std::string> vertices1 { "1", "2", "3", "4", "5", "6" };
+    std::vector<EdgeStruct> edges1 {
+      {"1", "2", 7}, {"1", "3", 9}, {"1", "6", 14}, {"2", "3", 10}, {"2", "4", 15}, {"3", "4", 11},
+      {"3", "6", 2}, {"4", "5", 6}, {"5", "6", 9},
+    };
+    std::vector<std::string> path;
+
+    for (const auto label : vertices1) g.addVertex(label);
+    for (const auto &e : edges1) g.addEdge(e.a, e.b, e.w);
+
+    g.printGraph();
+    g.shortestPath("1", "5", path);
+
+    return 0;
+}
+
+/****** USER INPUT GRAPH TEST *******
 
 #include "Graph.hpp"
 #include <iostream>
@@ -30,6 +57,7 @@ int main() {
 
     return 0;
 }
+*/
 
 /****** GENERIC TEST ********
 
