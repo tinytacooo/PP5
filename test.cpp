@@ -19,9 +19,9 @@ int main() {
             return 0;
 
         switch(opt) {
-            case 1: { cout << "Add vertex: "; cin >> v1; G.addVertex(v1); break; }
-            case 2: { cout << "Remove vertex: "; cin >> v1; G.removeVertex(v1); break; }
-            case 3: { cout << "Enter v1, v1, weight: "; cin >> v1; cin >> v2; cin >> n; G.addEdge(v1, v2, n); }
+            case 1: { cin >> v1; G.addVertex(v1); break; }
+            case 2: { cin >> v1; G.removeVertex(v1); break; }
+            case 3: { cin >> v1; cin >> v2; cin >> n; G.addEdge(v1, v2, n); }
         }
 
         G.printGraph();

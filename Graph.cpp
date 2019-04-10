@@ -8,21 +8,18 @@ void Graph::removeVertex(std::string label) {
     Vertex* v = &(V.at(label));
 
     std::cout << "FOUND VERTEX: " << v->getLabel() << std::endl;
-/*
-    for (auto it : V) {
-        if(it.first != label && it.second.getAdjacentVertices().find(label) != it.second.getAdjacentVertices().end())
-            std::cout << "AT VERTEX " << it.first << " FOUND " << it.second.getAdjacentVertices().find(label)->first << std::endl;
-    }
-*/
 
-    for (auto it : V) {
-        for (std::set<Vertex*>::iterator itr = it.second.getAdjacentVertices().begin(); itr != it.second.getAdjacentVertices().end(); itr++) {
-            std::cout << *itr << std::endl;
+    for (std::map<std::string, Vertex>::iterator it = V.begin(); it != V.end(); it++) {
+        bool b = it->second.hasAdjVertex(label);
+        std::cout << (b ? "HAS VERTEX" : "DOES NOT HAVE VERTEX") << std::endl;
+
+        if(v != nullptr) {
+            std::cout << "FROM " << it->first << " REMOVING " << v->getLabel() << std::endl;
+            std::cout << "REMOVED " << it->second.removeAdjVertex(label) << " RECORDS\n";
         }
-        Vertex* v = it.second.findVertex(label);
     }
 
-    V.erase(label);
+//    V.erase(label);
 }
 
 void Graph::addEdge(std::string label1, std::string label2, unsigned long weight) {
@@ -49,18 +46,20 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
 
 /* helpers */
 
-Vertex* Graph::Vertex::findVertex(std::string label) {
-    for (auto it : adjVertices) {
-        if (label == it->getLabel())
-            return it;
-    }
-
-    return nullptr;
+bool Vertex::hasAdjVertex(std::string label) {
+    if (adjVertices.find(label) != adjVertices.end())
+        return true;
+    else
+        return false;
 }
 
 void Graph::addAdjacency(std::string curr, std::string adj) {
-//    Vertex* v = &(V.at(adj));
-    V.at(curr).addAdjVertex(&(V.at(adj)));
+    V.at(curr).addAdjVertex(adj, &(V.at(adj)));
+}
+
+void Vertex::printAdjV() {
+    for (auto it : adjVertices)
+        std::cout << it.first << " ";
 }
 
 void Graph::printGraph() {
@@ -68,7 +67,7 @@ void Graph::printGraph() {
     for (auto it : V) {
         std::cout << it.second.getLabel() << "\t=>";
         for (auto itr : it.second.getAdjacentVertices())
-            std::cout << "\t" << itr->getLabel();
+            std::cout << "\t" << itr.first;
         std::cout << "\n";
     }
 }
