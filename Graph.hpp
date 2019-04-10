@@ -53,11 +53,13 @@ public:
     unsigned long shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path);
     /* helpers */
     void addAdjacency(std::string curr, std::string adj);                           // add vertex adjaceny
+    unsigned long buildPath(std::string startLabel, std::string endLabel, std::map<std::string, std::string> visited, std::vector<std::string>& path);
     unsigned long compareDistances(std:: string curr, std::string adj, unsigned long currDistance, unsigned long oldDistance);
     int getEdgeId(std::string label1, std::string label2);                          // return edgeId of edge containing a pair of vertices
     int getEdgeId(std::string label1);                                              // return edgeId of edge containing a vertex
     std::string getMinDistanceLabel(std::map<std::string, unsigned long> vDist);    // return label of vertex w/ min distance to start vertex
     unsigned long getWeight(std::string curr, std::string adj);                     // get weight of edge, given a pair of vertices
+    bool isUnvisited(std::string label,std:: map<std::string, unsigned long> unvisited);
     void printGraph(); // REMOVE
 };
 

@@ -38,52 +38,63 @@ void Graph::removeEdge(std::string label1, std::string label2) {
 }
 
 void Graph::removeEdge(std::string label1) {
-    int id = getEdgeId(label1);
-    if (id != 0)
-        E.erase(id);
+    if (getEdgeId(label1) != 0)
+        E.erase(getEdgeId(label1));
 }
 
 unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path) {
-    std::map<std::string, unsigned long> vertexDistance;
-    std::map<std::string, std::string> minDistances;
+    std::map<std::string, unsigned long> unvisited;    // contains unvisited vertices: <label, distance_to_vertex>
+    std::map<std::string, std::string> visited;        // contains visited vertices:   <label, adjacent_vertex_with_shortest_distance>
+    unsigned long shortestDistance = 0;                // return this value as the distance of the shortest possible path
+
+    // set all vertices in "unvisited" to have an initial distance of 'infinity' from the start vtx (except start vtx, which has an initial distance of 0)
+    // set initial shortest path to each vertex as itself (eventually replace these values using Djikstra's algorithm)
     for (auto it : V) {
-        vertexDistance.insert({it.first, LONG_MAX});    // all vertices have an initial distance of 'infinity'
-        minDistances.insert({it.first, it.first});         // initial shortest path in direction of start vertex from each vertex is unknown
+        (it.first == startLabel) ? unvisited.insert({it.first, 0}) : unvisited.insert({it.first, LONG_MAX});
+        visited.insert({it.first, it.first});
     }
 
-    vertexDistance.at(startLabel) = 0;      // distance from start vertex to itself is 0
+    // For each vertex, determine which of its adjacent vertices grants the shortest route to the start vertex.
+    while (!unvisited.empty()) {
+        std::string currLabel = getMinDistanceLabel(unvisited);     // get label of next vertex w/ shortest distance to start vertex
+        unsigned long currDistance = unvisited.at(currLabel);       // get distance associated with current vertex
 
-    while (!vertexDistance.empty()) {
-        std::string currLabel = getMinDistanceLabel(vertexDistance);
-        Vertex curr = V.at(currLabel);
-        unsigned long currDistance = vertexDistance.at(currLabel);
-
-        for (auto it : curr.getAdjacentVertices()) {
-            if (vertexDistance.find(it.first) != vertexDistance.end()) {
-                unsigned long oldDistance = vertexDistance.at(it.first);
-                vertexDistance.at(it.first) = compareDistances(currLabel, it.first, currDistance, oldDistance);
-                (oldDistance != vertexDistance.at(it.first)) ? minDistances.at(it.first) = currLabel : it.first;
+        for (auto it : V.at(currLabel).getAdjacentVertices()) {             // iterate through list of vertices adjacent to the current vertex
+            if (isUnvisited(it.first, unvisited)) {                         // if adjacent vertex is unvisited
+                // temporarily store value of distance associated with the adjecent vertex
+                unsigned long oldDistance = unvisited.at(it.first);
+                // compare the adjecent vertex's distance (oldDistance) with potential new distance (current vertex distance + weight of edge (curr, adj))
+                unvisited.at(it.first) = compareDistances(currLabel, it.first, currDistance, oldDistance);
+                // if oldDistance was replaced with newDistance, update shortest path to adjacent vertex with current vertex
+                if (oldDistance != unvisited.at(it.first)) { visited.at(it.first) = currLabel; }
             }
         }
 
-        vertexDistance.erase(currLabel);
+        unvisited.erase(currLabel);         // remove vertex from "unvisited" list
     }
 
-    std::string currLabel = endLabel;
-    unsigned int sum = 0;
-    path.emplace(path.begin(), endLabel);
-    while (currLabel != startLabel) {
-        path.emplace(path.begin(), minDistances.at(currLabel));
-        sum += getWeight(currLabel, minDistances.at(currLabel));
-        currLabel = minDistances.at(currLabel);
-    }
+    shortestDistance = buildPath(startLabel, endLabel, visited, path);
 
-    return sum;
+    return shortestDistance;
 }
 
 /* GRAPH helpers */
 void Graph::addAdjacency(std::string curr, std::string adj) {
     V.at(curr).addAdjVertex(adj, &(V.at(adj)));
+}
+
+unsigned long Graph::buildPath(std::string startLabel, std::string endLabel, std::map<std::string, std::string> visited, std::vector<std::string>& path) {
+    std::string currLabel = endLabel;
+    unsigned long sum = 0;
+
+    path.emplace(path.begin(), endLabel);
+    while (currLabel != startLabel) {
+        path.emplace(path.begin(), visited.at(currLabel));
+        sum += getWeight(currLabel, visited.at(currLabel));
+        currLabel = visited.at(currLabel);
+    }
+
+    return sum;
 }
 
 unsigned long Graph::compareDistances(std:: string curr, std::string adj, unsigned long currDistance, unsigned long oldDistance) {
@@ -124,6 +135,10 @@ std::string Graph::getMinDistanceLabel(std::map<std::string, unsigned long> vDis
 
 unsigned long Graph::getWeight(std::string curr, std::string adj) {
     return E.at(getEdgeId(curr, adj)).getWeight();
+}
+
+bool Graph::isUnvisited(std::string label, std::map<std::string, unsigned long> unvisited) {
+    return (unvisited.find(label) != unvisited.end());
 }
 
 /* REMOVE */
