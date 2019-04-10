@@ -48,7 +48,7 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
     std::map<std::string, std::string> minDistances;
     for (auto it : V) {
         vertexDistance.insert({it.first, LONG_MAX});    // all vertices have an initial distance of 'infinity'
-        minDistances.insert({it.first, "UNK"});         // initial shortest path in direction of start vertex from each vertex is unknown
+        minDistances.insert({it.first, it.first});         // initial shortest path in direction of start vertex from each vertex is unknown
     }
 
     vertexDistance.at(startLabel) = 0;      // distance from start vertex to itself is 0
@@ -58,10 +58,6 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
         Vertex curr = V.at(currLabel);
         unsigned long currDistance = vertexDistance.at(currLabel);
 
-        std::cout << "CURRVERTEX: " << currLabel << "\tADJACENCIES:\t";
-        for (auto it : vertexDistance) { std::cout << it.first << ", " << it.second << "\t"; }
-        std::cout << "\n";
-
         for (auto it : curr.getAdjacentVertices()) {
             if (vertexDistance.find(it.first) != vertexDistance.end()) {
                 unsigned long oldDistance = vertexDistance.at(it.first);
@@ -70,30 +66,17 @@ unsigned long Graph::shortestPath(std::string startLabel, std::string endLabel, 
             }
         }
 
-        std::cout << "CURRVERTEX: " << currLabel << "\tFIXED ADJCN:\t";
-        for (auto it : vertexDistance) { std::cout << it.first << ", " << it.second << "\t"; }
-        std::cout << "\n\tLIST:\t";
-        for (auto it : minDistances) { std::cout << it.first << ", " << it.second << "\t"; }
-        std::cout << "\n";
-
         vertexDistance.erase(currLabel);
     }
 
-    std::cout << "FINAL LIST:\t";
-    for (auto it : minDistances) { std::cout << it.first << ", " << it.second << "\t"; }
-    std::cout << "\n";
-
     std::string currLabel = endLabel;
     unsigned int sum = 0;
-    std::string pathl = endLabel;
     path.emplace(path.begin(), endLabel);
     while (currLabel != startLabel) {
-        pathl = minDistances.at(currLabel) + " " + pathl;
         path.emplace(path.begin(), minDistances.at(currLabel));
         sum += getWeight(currLabel, minDistances.at(currLabel));
         currLabel = minDistances.at(currLabel);
     }
-    std::cout << "SHORTEST PATH (" << sum  << "): " << pathl << std::endl;
 
     return sum;
 }
@@ -141,11 +124,6 @@ std::string Graph::getMinDistanceLabel(std::map<std::string, unsigned long> vDis
 
 unsigned long Graph::getWeight(std::string curr, std::string adj) {
     return E.at(getEdgeId(curr, adj)).getWeight();
-}
-
-/* VERTEX methods */
-bool Vertex::hasAdjVertex(std::string label) {
-    return (adjVertices.find(label) != adjVertices.end());
 }
 
 /* REMOVE */

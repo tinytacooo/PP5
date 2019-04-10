@@ -18,9 +18,6 @@ public:
     void removeAdjVertex(std::string label) { adjVertices.erase(label); }
     std::map<std::string, Vertex*> getAdjacentVertices() const { return adjVertices; }
     std::string getLabel() const { return label; }
-    /* helpers, operator overloads */
-    bool hasAdjVertex(std::string label);
-    bool operator< (const Vertex & r) const { return ( this->label < r.label ); }
 };
 
 class Edge {
@@ -34,21 +31,20 @@ public:
     std::string getStartVertex() { return startVertex; }
     std::string getEndVertex() { return endVertex; }
     unsigned long getWeight() { return weight; }
-    /* helpers, operator overloads */
+    /* helpers */
     bool isStartVertex(std::string l1, std::string l2) { return (startVertex == l1 || startVertex == l2); }
     bool isStartVertex(std::string l1) { return (startVertex == l1); }
     bool isEndVertex(std::string l1, std::string l2) { return (endVertex == l1 || endVertex == l2); }
     bool isEndVertex(std::string l1) { return (endVertex == l1); }
-    bool operator< (const Edge & r) const { return ( this->startVertex < r.endVertex && this->endVertex < r.startVertex && this->weight < r.weight ); }
 };
 
 class Graph : public GraphBase {
 private:
     std::map<std::string, Vertex> V;      // <Vertex label, Vertex pointer>
     std::map<int, Edge> E;                // <Edge ID, Edge pointer>
-    int edgeId = 0;                       // Keep track of edge ID; this does not indicate the length of the Edge map
+    int edgeId = 0;                       // Assign an ID to each edge; this number only ever increases
 public:
-    /* functions from abstract class */
+    /* functions inherited from abstract class */
     void addVertex(std::string label);
     void removeVertex(std::string label);
     void addEdge(std::string label1, std::string label2, unsigned long weight);
@@ -56,12 +52,12 @@ public:
     void removeEdge(std::string label1);
     unsigned long shortestPath(std::string startLabel, std::string endLabel, std::vector<std::string> &path);
     /* helpers */
-    void addAdjacency(std::string curr, std::string adj);               // add vertex adjaceny
+    void addAdjacency(std::string curr, std::string adj);                           // add vertex adjaceny
     unsigned long compareDistances(std:: string curr, std::string adj, unsigned long currDistance, unsigned long oldDistance);
-    int  getEdgeId(std::string label1, std::string label2);             // each edge has an id; returns this value
-    int  getEdgeId(std::string label1);
+    int getEdgeId(std::string label1, std::string label2);                          // return edgeId of edge containing a pair of vertices
+    int getEdgeId(std::string label1);                                              // return edgeId of edge containing a vertex
     std::string getMinDistanceLabel(std::map<std::string, unsigned long> vDist);    // return label of vertex w/ min distance to start vertex
-    unsigned long getWeight(std::string curr, std::string adj);
+    unsigned long getWeight(std::string curr, std::string adj);                     // get weight of edge, given a pair of vertices
     void printGraph(); // REMOVE
 };
 
